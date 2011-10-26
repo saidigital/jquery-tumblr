@@ -13,10 +13,10 @@
 (function( $ ) {
 
 	var methods = {
-		
+
 		/**
 		 * Initialise the tumblr feed.
-		 * 
+		 *
 		 * @param options     Valid params:
 		 *                        - url: your tumblr url (ie. http://(YOUR NAME).tumblr.com )
 		 *                        - loading: A selector that specifies a element that can be shown when loading content from tumblr.
@@ -46,14 +46,14 @@
 				'timeago'            : true,
 				'shortLength'        : 50,
 				'mediumLength'       : 100,
-				'fancybox'           : true,
+				'fancybox'           : false,
 				'photoThumbSize'     : 75,
 				'photoLightboxSize'  : 500,
 				'timeout'            : 10000
 		    };
 			var that = this;
-			
-			return this.each(function() {        
+
+			return this.each(function() {
 				// If options exist, lets merge them with our default settings
 				var $this = $(this),
 					data = $this.data('tumblr'),
@@ -61,7 +61,7 @@
 
 				// If the plugin hasn't been initialized yet
 				if ( ! data ) {
-					if ( options ) { 
+					if ( options ) {
 						$.extend( settings, options );
 					}
 					if( settings.pagination ) {
@@ -81,16 +81,16 @@
 						start            : settings.start,
 						options          : settings,
 						posts            : posts,
-						pagination_setup : false 
+						pagination_setup : false
 					});
 				}
 				$this.tumblr('load');
 			});
 		},
-		
+
 		/**
 		 * Load the tumblr feed.
-		 * 
+		 *
 		 * @param Int page    The page number to load (starts at 0).
 		 */
 		load: function(page) {
@@ -105,13 +105,13 @@
 				$this.slideUp();
 			});
 
-			var $this = this, 
+			var $this = this,
 				data = this.data('tumblr'),
 				params = {
 					start: page == undefined ? data.start * data.options.perPage : page * data.options.perPage,
 					num: data.options.perPage
 				},
-				url = data.options.url + '/api/read/json?' + $.param(params);				
+				url = data.options.url + '/api/read/json?' + $.param(params);
 
 			$.ajax({
 				url: url,
@@ -131,7 +131,7 @@
 			});
 			return this;
 		},
-		
+
 		handleAjaxSuccess: function(tumblr_api_read) {
 			return this.each(function() {
 				var $this = $(this),
@@ -145,12 +145,12 @@
 					$this.append('<div class="tumblr-error">Unable to load tumblr - its probably down...</div>');
 					return;
 				}
-				
+
 				$.each(tumblr_api_read.posts, function(i, post) {
 					$this.tumblr('addPost', post, postIterator);
 					postIterator++;
 				});
-				
+
 				if(data.options.timeago && $("abbr.timeago", data.posts).length > 0) {
 					$("abbr.timeago", data.posts).timeago();
 				}
@@ -162,15 +162,15 @@
 					data.options.loading.hide();
 				}
 				$this.slideDown();
-				
+
 				if(data.options.pagination && !data.pagination_setup) {
 					data.pagination_setup = true;
 					$.extend(
-						data.options.paginationOptions, 
+						data.options.paginationOptions,
 						{
 					        items_per_page : data.options.perPage,
 					        callback       : function(new_page_index, pagination_container) {
-					        	$this.tumblr('load', new_page_index);	
+					        	$this.tumblr('load', new_page_index);
 					        }
 						}
 					);
@@ -191,7 +191,7 @@
 					var extraClass = $this.tumblr('getCssTextLength', post['regular-title']);
 					body = '<div class="title ' + extraClass + '">' + post['regular-title'] + '</div>';
 					if(post['regular-body']) {
-						body += '<div class="description">' + post['regular-body'] + '</div>'; 
+						body += '<div class="description">' + post['regular-body'] + '</div>';
 					}
 					break;
 				}
@@ -203,7 +203,7 @@
 							var oddeven = i%2 ? 'even' : 'odd';
 							var alt = '';
 							if(photo['photo-caption'] != undefined) {
-								alt = ' alt="' + photo['photo-caption'] + '"'; 
+								alt = ' alt="' + photo['photo-caption'] + '"';
 							}
 							body += '<li class="' + oddeven + '">' +
 									'<a href="' + photo['photo-url-' + data.options.photoLightboxSize] + '" rel="post-' + post['id'] + '" class="lightbox">' +
@@ -237,7 +237,7 @@
 				}
 				case "quote": {
 					var extraClass = $this.tumblr('getCssTextLength', post['quote-text']);
-					body = 
+					body =
 	                    '<div class="quote">' +
 	                        '<div class="quote-text ' + extraClass + '">' + post['quote-text'] + '</div>' +
 							'<div class="source">&mdash; ' + post['quote-source'] + '</div>' +
@@ -248,15 +248,15 @@
 					var extraClass = $this.tumblr('getCssTextLength', post['conversation-title']);
 					body = '<div class="caption ' + extraClass + '">' + post['conversation-title'] + '</div>' +
 						'<div class="conversation">' + '<ul>';
-					
+
 					var users = [];
 					$.each(post['conversation'], function(i, item) {
 						if( $.inArray(users, item['name']) == -1 ) {
 							users.push(item['name']);
 						}
 						var user = $.inArray(users, item['name']) + 1;
-						body += 
-							'<li class="odd">' + 
+						body +=
+							'<li class="odd">' +
 								'<span class="label user-' + user + '">' + item['label'] + '</span>' +
 								'<span class="phrase">' + item['phrase'] + '</span>' +
 	                        '</li>';
@@ -267,7 +267,7 @@
 				case "audio": {
 					body = '<div class="media">' + post['audio-player'] + '</div>';
 					if(post['audio-caption']) {
-						body += '<div class="description">' + post['audio-caption'] + '</div>';	
+						body += '<div class="description">' + post['audio-caption'] + '</div>';
 					}
 					break;
 				}
@@ -283,11 +283,11 @@
 					break;
 				}
 				default:
-					break;			
+					break;
 			}
-			
+
 			// Add the li to the posts stack.
-			li = 
+			li =
 				'<li class="tumblr-post tumblr-post-' + post.type + ' post-id-' + post.id + ' ' + oddeven + '">' +
 					'<div class="post-body">' +
 		            	body +
